@@ -1,8 +1,11 @@
-def minkowski_distance(df, p,
-                       start_lat="pickup_latitude",
-                       start_lon="pickup_longitude",
-                       end_lat="dropoff_latitude",
-                       end_lon="dropoff_longitude"):
+def minkowski_distance(
+    df,
+    p,
+    start_lat="pickup_latitude",
+    start_lon="pickup_longitude",
+    end_lat="dropoff_latitude",
+    end_lon="dropoff_longitude",
+):
     x1 = df[start_lon]
     x2 = df[end_lon]
     y1 = df[start_lat]

@@ -10,64 +10,64 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 import joblib
 
+
 class Trainer(MLFlowBase):
-    
     def __init__(self):
         super().__init__(
-            "[PT] [LISBO] [MDK] TaxiFareRecap + 2",
-            "https://mlflow.lewagon.ai")
-    
+            "[PT] [LISBO] [MDK] TaxiFareRecap + 2", "https://mlflow.lewagon.ai"
+        )
+
     def run(self, model, **params):
-        
-        #get model name
-        str_model = str(model).split('.')[-1].replace("'>", '')
-        
-        #get data and split
+
+        # get model name
+        str_model = str(model).split(".")[-1].replace("'>", "")
+
+        # get data and split
         df = clean_df(get_data())
-        
+
         X_train, X_test, y_train, y_test = holdout(df)
-        
-        #get model
+
+        # get model
         mdl = get_model(model, **params)
         print(mdl)
-        
-        #set pipeline with model
+
+        # set pipeline with model
         pipeline = set_pipeline(mdl)
-        
-        #create run and log param
+
+        # create run and log param
         self.mlflow_create_run()
         self.mlflow_log_param("model_name", str_model)
-        
-        #loop over parameters and log
-        for k, v in  params.items():
+
+        # loop over parameters and log
+        for k, v in params.items():
             self.mlflow_log_param(f"{k}", v)
-        
-        #fit pipe
+
+        # fit pipe
         pipeline.fit(X_train, y_train)
-        
-        #get y_pred
+
+        # get y_pred
         y_pred = pipeline.predict(X_test)
-        
-        #compute rmse
+
+        # compute rmse
         rmse = compute_rmse(y_pred, y_test)
         print(rmse)
-        
-        #log rmse metric
+
+        # log rmse metric
         self.mlflow_log_metric("rmse", round(rmse, 2))
-        
-        #save model
-        joblib.dump(pipeline, f'{str_model}_model.joblib')
-                
-        
+
+        # save model
+        joblib.dump(pipeline, f"{str_model}_model.joblib")
+
 
 if __name__ == "__main__":
-    
+
     model_params_knn = dict(n_neighbors=10, leaf_size=10)
-    
-    model_params_rf = dict(
-        n_estimators=300,
-        max_depth=2)
-    
-    for params, model in zip([model_params_knn, model_params_rf], [KNeighborsRegressor, RandomForestRegressor]):
+
+    model_params_rf = dict(n_estimators=300, max_depth=2)
+
+    for params, model in zip(
+        [model_params_knn, model_params_rf],
+        [KNeighborsRegressor, RandomForestRegressor],
+    ):
         tr = Trainer()
         tr.run(model, **params)

@@ -2,8 +2,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from taxifare_02.utils import minkowski_distance
 import pandas as pd
 
-class DistanceTransformer(BaseEstimator, TransformerMixin):
 
+class DistanceTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, distance_type="euclidian", **kwargs):
         self.distance_type = distance_type
 
