@@ -1,5 +1,5 @@
 import mlflow
-from taxifare_02.data import get_data, holdout, clean_df
+from taxifare_02.data import get_data, holdout, clean_df, get_data_using_blob, save_model_locally, save_model_to_gcp
 from taxifare_02.model import get_model
 from taxifare_02.pipeline import set_pipeline
 from taxifare_02.metrics import compute_rmse
@@ -11,12 +11,14 @@ from sklearn.neighbors import KNeighborsRegressor
 import joblib
 
 
+
 class Trainer(MLFlowBase):
     def __init__(self):
         super().__init__(
             "[PT] [LISBO] [MDK] TaxiFareRecap + 3", "https://mlflow.lewagon.ai"
         )
-
+        
+        
     def run(self, model, **params):
 
         # get model name
@@ -24,7 +26,7 @@ class Trainer(MLFlowBase):
         print(str_model)
 
         # get data and split
-        df = clean_df(get_data())
+        df = clean_df(get_data_using_blob(1000))
 
         X_train, X_test, y_train, y_test = holdout(df)
 
@@ -55,8 +57,11 @@ class Trainer(MLFlowBase):
         # log rmse metric
         self.mlflow_log_metric("rmse", rmse)
 
-        # save model
-        joblib.dump(pipe, "model.joblib")
+        # save model locally
+        save_model_locally(pipe, str_model)
+        
+        #save model on gcp
+        save_model_to_gcp(str_model)
 
 
 if __name__ == "__main__":

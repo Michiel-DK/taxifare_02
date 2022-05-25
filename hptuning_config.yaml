@@ -1,0 +1,25 @@
+trainingInput:
+  hyperparameters:
+    goal: MINIMIZE
+    maxTrials: 20
+    maxParallelTrials: 0
+    hyperparameterMetricTag: rmse
+    enableTrialEarlyStopping: TRUE 
+    params:
+    - parameterName: alpha
+      type: DOUBLE
+      minValue:  0.000001
+      maxValue:  0.01
+      scaleType: UNIT_LINEAR_SCALE
+    - parameterName: max_iter
+      type: INTEGER
+      minValue: 1000
+      maxValue: 3000
+      scaleType: UNIT_LINEAR_SCALE   
+    - parameterName: penalty
+      type: CATEGORICAL
+      categoricalValues: [
+          "l1",
+          "l2",
+          "elasticnet"
+          ]

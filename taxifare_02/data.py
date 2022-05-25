@@ -1,12 +1,60 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from google.cloud import storage
+from termcolor import colored
+import joblib
+import os
 
+BUCKET_NAME = "wagon-data-867-dk"
+BUCKET_TRAIN_DATA_PATH = "data/train_1k.csv"
+BUCKET_MODEL_PATH = "models/TaxiFareModel"
 
 def get_data():
     url = "s3://wagon-public-datasets/taxi-fare-train.csv"
     df = pd.read_csv(url, nrows=100)
+    print(colored(f"data retrieved from AWS URL {url}", "blue"))
     return df
 
+
+def get_data_using_blob(line_count):
+
+    # get data from my google storage bucket
+
+    data_file = "train_1k.csv"
+
+    client = storage.Client()  # verifies $GOOGLE_APPLICATION_CREDENTIALS
+
+    bucket = client.bucket(BUCKET_NAME)
+
+    blob = bucket.blob(BUCKET_TRAIN_DATA_PATH)
+    
+    print(colored(f"data retrieved from GCP URL {BUCKET_NAME + '/'+BUCKET_TRAIN_DATA_PATH}", "red"))
+
+    blob.download_to_filename(data_file)
+
+    # load downloaded data to dataframe
+    df = pd.read_csv(data_file, nrows=line_count)
+    
+    os.remove(data_file)
+
+    return df
+
+def save_model_locally(pipe, model_name):
+    print(colored("model.joblib saved locally", "green"))
+    return joblib.dump(pipe, f"{model_name}.joblib")
+
+
+def save_model_to_gcp(model_name):
+
+    client = storage.Client()
+
+    bucket = client.bucket(BUCKET_NAME)
+
+    blob = bucket.blob(f"{BUCKET_MODEL_PATH}/{model_name}.joblib")
+    
+    print(colored("model.joblib saved GCP", "white"))
+    blob.upload_from_filename(f"{model_name}.joblib")
+    
 
 def clean_df(df):
     df = df.dropna(how="any", axis="rows")
