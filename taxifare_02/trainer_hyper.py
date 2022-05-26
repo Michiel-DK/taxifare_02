@@ -14,13 +14,17 @@ import hypertune
 import argparse
 
 
-class Trainer(MLFlowBase):
+class Trainer():
+    
+    """TRAINER CLASS FOR HYPER PARAM TRAINING ON GCP"""
+    
     def __init__(self):
-        super().__init__(
-            "[PT] [LISBO] [MDK] TaxiFareRecap + 3", "https://mlflow.lewagon.ai"
-        )
+        pass
         
     def get_args(self):
+        
+        """GET ARGUMENTS FROM CONFIG.YML"""
+        
         # Create the argument parser for each parameter plus the job directory
         parser = argparse.ArgumentParser()
 
@@ -53,21 +57,22 @@ class Trainer(MLFlowBase):
         return args
 
     def run(self, model):
+        
+        """RUN MODEL"""
 
         # get model name
         str_model = str(model).split(".")[-1].replace("'>", "")
         print(str_model)
         
+        #get args from yml file
         args = self.get_args()
 
         # get data and split
         df = clean_df(get_data_using_blob(1000))
 
         X_train, X_test, y_train, y_test = holdout(df)
-
-        # get model
-        #mdl = get_model(model)
         
+        #instantiate model with params from args
         mdl = model(
                 alpha=args.alpha,
                 max_iter=args.max_iter,
@@ -76,14 +81,6 @@ class Trainer(MLFlowBase):
 
         # set pipeline with model
         pipe = set_pipeline(mdl)
-
-        # create run and log param
-        # self.mlflow_create_run()
-        # self.mlflow_log_param("model", str_model)
-
-        # loop over hyperparameters and log
-        # for k, v in self.args.items():
-        #     self.mlflow_log_param(k, v)
 
         # fit pipe
         pipe.fit(X_train, y_train)
@@ -95,15 +92,13 @@ class Trainer(MLFlowBase):
         rmse = compute_rmse(y_pred, y_test)
         print(rmse)
         
+        #instantiate hypertune class
         hpt = hypertune.HyperTune()
         hpt.report_hyperparameter_tuning_metric(
                 hyperparameter_metric_tag='rmse',
                 metric_value=rmse,
                 global_step=1000
         )
-
-        # log rmse metric
-        # self.mlflow_log_metric("rmse", rmse)
 
         # save model locally
         save_model_locally(pipe, str_model)

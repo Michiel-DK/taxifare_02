@@ -4,6 +4,9 @@ import pandas as pd
 
 
 class DistanceTransformer(BaseEstimator, TransformerMixin):
+    
+    """CUSTOM TRANSFORMER"""
+    
     def __init__(self, distance_type="euclidian", **kwargs):
         self.distance_type = distance_type
 

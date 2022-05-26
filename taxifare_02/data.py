@@ -10,6 +10,9 @@ BUCKET_TRAIN_DATA_PATH = "data/train_1k.csv"
 BUCKET_MODEL_PATH = "models/TaxiFareModel"
 
 def get_data():
+    
+    """GET DATA FROM AWS BUCKET"""
+    
     url = "s3://wagon-public-datasets/taxi-fare-train.csv"
     df = pd.read_csv(url, nrows=100)
     print(colored(f"data retrieved from AWS URL {url}", "blue"))
@@ -17,8 +20,8 @@ def get_data():
 
 
 def get_data_using_blob(line_count):
-
-    # get data from my google storage bucket
+    
+    """GET DATA FROM GCP BUCKET"""
 
     data_file = "train_1k.csv"
 
@@ -32,7 +35,6 @@ def get_data_using_blob(line_count):
 
     blob.download_to_filename(data_file)
 
-    # load downloaded data to dataframe
     df = pd.read_csv(data_file, nrows=line_count)
     
     os.remove(data_file)
@@ -40,11 +42,16 @@ def get_data_using_blob(line_count):
     return df
 
 def save_model_locally(pipe, model_name):
+    
+    """SAVE MODEL LOCALLY"""
+    
     print(colored("model.joblib saved locally", "green"))
     return joblib.dump(pipe, f"{model_name}.joblib")
 
 
 def save_model_to_gcp(model_name):
+    
+    """SAVE MODEL ON GCP"""
 
     client = storage.Client()
 
@@ -57,6 +64,9 @@ def save_model_to_gcp(model_name):
     
 
 def clean_df(df):
+    
+    """CLEAN DF"""
+    
     df = df.dropna(how="any", axis="rows")
     df = df[(df.dropoff_latitude != 0) | (df.dropoff_longitude != 0)]
     df = df[(df.pickup_latitude != 0) | (df.pickup_longitude != 0)]
@@ -72,6 +82,8 @@ def clean_df(df):
 
 
 def holdout(df):
+    
+    """GENERATE TRAIN AND TEST DATA"""
 
     y = df["fare_amount"]
     X = df.drop("fare_amount", axis=1)

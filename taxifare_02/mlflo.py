@@ -5,6 +5,9 @@ from mlflow.tracking import MlflowClient
 
 
 class MLFlowBase:
+    
+    """BASE ML FLOW CLASS TO INHERIT ATTRIBUTES FROM"""
+    
     def __init__(self, experiment_name, MLFLOW_URI):
         self.experiment_name = experiment_name
         self.MLFLOW_URI = MLFLOW_URI

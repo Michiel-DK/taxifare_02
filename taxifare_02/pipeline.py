@@ -5,6 +5,9 @@ from taxifare_02.transformers import DistanceTransformer
 
 
 def set_pipeline(model):
+    
+    """SET PIPELINE FUNCTION"""
+    
     pipe_distance = make_pipeline(DistanceTransformer(), StandardScaler())
 
     cols = [

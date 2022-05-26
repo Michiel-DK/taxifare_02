@@ -13,6 +13,9 @@ import joblib
 
 
 class Trainer(MLFlowBase):
+    
+    '''CLASS WITH INDIVIDUAL TRAINER'''
+    
     def __init__(self):
         super().__init__(
             "[PT] [LISBO] [MDK] TaxiFareRecap + 3", "https://mlflow.lewagon.ai"
@@ -65,6 +68,8 @@ class Trainer(MLFlowBase):
 
 
 if __name__ == "__main__":
+    
+    #Run different models locally + logging on MLFLOW
 
     model_params_knn = dict(n_neighbors=10, leaf_size=10)
 
